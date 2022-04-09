@@ -9,6 +9,8 @@
 #include "Shader.h"
 #include "GLHead.h"
 #include "Texture.h"
+#include "glm.hpp"
+#include "gtc/matrix_transform.hpp"
 
 //struct ShaderProgramSource
 //{
@@ -115,6 +117,7 @@ int main(void)
 
         std::cout<< glGetString(GL_VERSION) << std::endl;
 
+
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
@@ -129,6 +132,9 @@ int main(void)
             0, 1, 2,
             2, 3, 0
         };
+
+
+
 
 
 //        unsigned int vao;
@@ -172,9 +178,20 @@ int main(void)
 
         IndexBuffer eb(indices, 6);
 
+
+        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-0.3f, 0.0f, 0.0));
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.3f, 0.0));
+
+
+        glm::mat4 mvp =  model * view * proj;
+
+
+
         Shader shader("../OpenGL/res/shaders/Basic.shader");
         shader.Bind();
         shader.SetUniform4f("u_Color", 0.2f, 0.4f, 0.8f, 1.0f);
+        shader.SetUniformMat4f("u_Mvp", mvp);
 
         Texture texture("../OpenGL/res/textures/ChernoLogo.png");
         texture.Bind();

@@ -27,12 +27,18 @@ link_directories(${GLEW_PATH}/lib)
 file(GLOB head_list *.h)
 file(GLOB src_list *.cpp)
 file(GLOB stb_image_list vendor/stb_image/*.*)
+file(GLOB glm_head vendor/glm
+    vendor/glm/detail
+    vendor/glm/ext
+    vendor/glm/gtc
+    vendor/glm/gtx
+    vendor/glm/simd)
 
 include_directories(
     ${GLFW_PATH}/include
     ${GLEW_PATH}/include
     vendor/stb_image
-    vendor/glm)
+    ${glm_head})
 
 find_library(OpenGL_LIBRARY OpenGL )
 find_library(Cocoa_LIBRARY Cocoa )
