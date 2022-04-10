@@ -49,9 +49,10 @@ namespace test
          unsigned int m_QuadEB;
          std::unique_ptr<Shader> m_Shader;
          std::unique_ptr<Texture> m_Texture[2];
+         float m_Scale;
 
          glm::mat4 m_Proj, m_View, m_Model;
-         glm::vec3 m_TranslationA, m_TranslationB, m_Scale;
+         glm::vec3 m_TranslationA, m_TranslationB;
 
     private:
         Vertex* CreateQuad(Vertex* vertex, float x, float y, float textureID);

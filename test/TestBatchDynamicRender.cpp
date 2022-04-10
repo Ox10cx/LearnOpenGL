@@ -15,7 +15,7 @@ namespace test
         m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0))),
         m_Model(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0))),
         m_TranslationA(glm::vec3(-0.1f, 0.0f, 0.0)), m_TranslationB(glm::vec3(0.0f,0.1f, 0.0)),
-        m_Scale(glm::vec3(1.0f, 1.0f, 1.0f))
+        m_Scale(1.0f)
     {
 
       const size_t MaxQuadCount = 1000;
@@ -215,9 +215,8 @@ namespace test
 
         glm::mat4 modelA = glm::translate(glm::mat4(1.0f), m_TranslationA);
         glm::mat4 modelB = glm::translate(glm::mat4(1.0f), m_TranslationB);
-        glm::mat4 modelScale = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 1.0f));
-        glm::mat4 mvpA = modelScale * m_Proj * m_View * modelA;
-        glm::mat4 mvpB = modelScale * m_Proj * m_View * modelB;
+        glm::mat4 mvpA = glm::scale(glm::mat4(1.0f), glm::vec3(m_Scale, m_Scale, m_Scale)) * m_Proj * m_View * modelA;
+        glm::mat4 mvpB = glm::scale(glm::mat4(1.0f), glm::vec3(m_Scale, m_Scale, m_Scale)) * m_Proj * m_View * modelB;
 
         glm::mat4 mvps[2] = { mvpA, mvpB};
 
@@ -237,7 +236,7 @@ namespace test
     {
         ImGui::SliderFloat3("m_TranslationA", &m_TranslationA.x, -1.0f, 1.0f);
         ImGui::SliderFloat3("m_TranslationB", &m_TranslationB.x, -1.0f, 1.0f);
-        ImGui::SliderFloat3("m_Scale", &m_Scale.x, 0.0f, 1.0f);
+        ImGui::SliderFloat("m_Scale", &m_Scale, 0.0f, 1.0f);
     }
 
 }
