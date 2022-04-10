@@ -20,6 +20,7 @@
 #include "TestClearColor.h"
 #include "TestTexture2D.h"
 #include "TestBatchRender.h"
+#include "TestBatchDynamicRender.h"
 
 //struct ShaderProgramSource
 //{
@@ -225,8 +226,9 @@ int main(void)
         currentTest = testMenu;
 
         testMenu->RegisterTest<test::TestClearColor>("Clear Color");
-        testMenu->RegisterTest<test::TestTexture2D>("texture 2d");
-        testMenu->RegisterTest<test::TestBatchRender>("batch Render");
+        testMenu->RegisterTest<test::TestTexture2D>("Texture 2d");
+        testMenu->RegisterTest<test::TestBatchRender>("Batch Render");
+        testMenu->RegisterTest<test::TestBatchDynamicRender>("Batch Dynamic Render");
 
 
 
