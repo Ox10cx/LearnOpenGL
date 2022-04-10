@@ -51,7 +51,7 @@ namespace test
          std::unique_ptr<Texture> m_Texture[2];
 
          glm::mat4 m_Proj, m_View, m_Model;
-         glm::vec3 m_TranslationA, m_TranslationB;
+         glm::vec3 m_TranslationA, m_TranslationB, m_Scale;
 
     private:
         Vertex* CreateQuad(Vertex* vertex, float x, float y, float textureID);

@@ -14,7 +14,8 @@ namespace test
         :m_Proj(glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f)),
         m_View(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0))),
         m_Model(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0))),
-        m_TranslationA(glm::vec3(-0.1f, 0.0f, 0.0)), m_TranslationB(glm::vec3(0.0f,0.1f, 0.0))
+        m_TranslationA(glm::vec3(-0.1f, 0.0f, 0.0)), m_TranslationB(glm::vec3(0.0f,0.1f, 0.0)),
+        m_Scale(glm::vec3(1.0f, 1.0f, 1.0f))
     {
 
       const size_t MaxQuadCount = 1000;
@@ -42,25 +43,25 @@ namespace test
        GLCall(glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof (Vertex), (const void *) offsetof(Vertex, TexID)));
 
 
-        unsigned int indices[] = {
-            0, 1, 2, 2, 3, 0,
-            4, 5, 6, 6, 7, 4
-        };
-//       unsigned int indices[MaxIndexCount];
-//       unsigned offset = 0;
-//       for (size_t i = 0; i < MaxIndexCount; i+=6)
-//       {
-//           indices[i + 0] = 0 + offset;
-//           indices[i + 1] = 1 + offset;
-//           indices[i + 2] = 2 + offset;
+//        unsigned int indices[] = {
+//            0, 1, 2, 2, 3, 0,
+//            4, 5, 6, 6, 7, 4
+//        };
+       uint32_t indices[MaxIndexCount];
+       uint32_t offset = 0;
+       for (size_t i = 0; i < MaxIndexCount; i += 6)
+       {
+           indices[i + 0] = 0 + offset;
+           indices[i + 1] = 1 + offset;
+           indices[i + 2] = 2 + offset;
 
-//           indices[i + 3] = 2 + offset;
-//           indices[i + 4] = 3 + offset;
-//           indices[i + 5] = 0 + offset;
+           indices[i + 3] = 2 + offset;
+           indices[i + 4] = 3 + offset;
+           indices[i + 5] = 0 + offset;
 
-//           offset += 4;
+           offset += 4;
 
-//       }
+       }
 
 
         GLCall(glGenBuffers(1, &m_QuadEB));
@@ -121,6 +122,7 @@ namespace test
          vertex->Color = {0.18f, 0.6f, 0.96f, 1.0f};
          vertex->TexCoords= {0.0f, 1.0f};
          vertex->TexID = textureID;
+         vertex++;
 
          return vertex;
 
@@ -179,42 +181,43 @@ namespace test
 
 //        };
 
-        auto q0 = CreateQuad(m_TranslationA[0], m_TranslationA[1], 0.0f);
-        auto q1 = CreateQuad(0.5f,  -0.5f, 1.0f);
+//        auto q0 = CreateQuad(m_TranslationA[0], m_TranslationA[1], 0.0f);
+//        auto q1 = CreateQuad(0.5f,  -0.5f, 1.0f);
 
-        Vertex vertices[8];
-        memcpy(vertices, q0.data(), q0.size() * sizeof (Vertex));
-        memcpy(vertices + q0.size() , q1.data(), q1.size() * sizeof (Vertex));
-
-
-        glBindBuffer(GL_ARRAY_BUFFER, m_QuadVB);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+//        Vertex vertices[8];
+//        memcpy(vertices, q0.data(), q0.size() * sizeof (Vertex));
+//        memcpy(vertices + q0.size() , q1.data(), q1.size() * sizeof (Vertex));
 
 
-//        unsigned int indexCount = 0;
-
-//        std::array<Vertex, 1000> vertices;
-//        Vertex* buffer = vertices.data();
-//        for (int y = 0; y < 5; y++) {
-//            for (int x = 0; x < 5; x++) {
-//                buffer = CreateQuad(buffer, x, y, (x + y) % 2);
-//                indexCount += 6;
-//            }
-//        }
-
-//        buffer = CreateQuad(buffer, -1.5f, -0.5f, 0.0f);
-//        indexCount += 6;
-
-        //Set dynamic vertex buffer
 //        glBindBuffer(GL_ARRAY_BUFFER, m_QuadVB);
-//        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof (vertices), vertices.data());
+//        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+
+        unsigned int indexCount = 0;
+
+        std::array<Vertex, 1000> vertices;
+        Vertex* buffer = vertices.data();
+        for (int y = 0; y < 5; y++) {
+            for (int x = 0; x < 5; x++) {
+                buffer = CreateQuad(buffer, x, y, (x + y) % 2);
+                indexCount += 6;
+            }
+        }
+
+        buffer = CreateQuad(buffer, m_TranslationA[0], m_TranslationA[1], 0.0f);
+        indexCount += 6;
+
+        // Set dynamic vertex buffer
+        glBindBuffer(GL_ARRAY_BUFFER, m_QuadVB);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof (Vertex), vertices.data());
 
 
 
         glm::mat4 modelA = glm::translate(glm::mat4(1.0f), m_TranslationA);
         glm::mat4 modelB = glm::translate(glm::mat4(1.0f), m_TranslationB);
-        glm::mat4 mvpA = m_Proj * m_View * modelA;
-        glm::mat4 mvpB = m_Proj * m_View * modelB;
+        glm::mat4 modelScale = glm::scale(glm::mat4(1.0f), m_Scale);
+        glm::mat4 mvpA = m_Proj * m_View * modelA * modelScale;
+        glm::mat4 mvpB = m_Proj * m_View * modelB * modelScale;
 
         glm::mat4 mvps[2] = { mvpA, mvpB};
 
@@ -223,7 +226,7 @@ namespace test
 
 
         GLCall(glBindVertexArray(m_QuadVA));
-        GLCall(glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, nullptr));
+        GLCall(glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr));
     }
 
     void TestBatchDynamicRender::OnRender()
@@ -234,6 +237,7 @@ namespace test
     {
         ImGui::SliderFloat3("m_TranslationA", &m_TranslationA.x, -1.0f, 1.0f);
         ImGui::SliderFloat3("m_TranslationB", &m_TranslationB.x, -1.0f, 1.0f);
+        ImGui::SliderFloat3("m_Scale", &m_Scale.x, 0.0f, 1.0f);
     }
 
 }
