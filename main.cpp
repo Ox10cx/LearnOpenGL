@@ -11,6 +11,11 @@
 #include "Texture.h"
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
+#include "Render.h"
+
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 //struct ShaderProgramSource
 //{
@@ -204,6 +209,17 @@ int main(void)
         eb.Unbind();
         shader.Unbind();
 
+        Render render;
+
+        ImGui::CreateContext();
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui::StyleColorsDark();
+
+        const char* glsl_version = "#version 330";
+        ImGui_ImplOpenGL3_Init(glsl_version);
+
+        glm::vec3 translationA(-0.1f, 0.0f, 0.0);
+        glm::vec3 translationB(-0.5f, 0.0f, 0.0);
 
         float r = 0.0f;
         float increment = 0.05f;
@@ -211,7 +227,7 @@ int main(void)
        while (!glfwWindowShouldClose(window))
        {
            /* Render here */
-           GLCall(glClear(GL_COLOR_BUFFER_BIT));
+//           GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
 //           GLCall(glUseProgram(shaderProgram));
 //           GLCall(glUniform4f(location, r, 0.4f, 0.8f, 1.0f));
@@ -219,22 +235,55 @@ int main(void)
 //           GLCall(glBindVertexArray(vao));
 //           GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
+//           shader.Bind();
+//           shader.SetUniform4f("u_Color", r, 0.4f, 0.8f, 1.0f);
+//           va.Bind();
+//           eb.Bind();
+
+
+
+//           GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+
+
+//           if (r > 1.0f)
+//               increment = -0.05f;
+//           else if (r < 0.0f)
+//               increment = 0.05f;
+//           r += increment;
+
+           render.Clear();
+
+           ImGui_ImplOpenGL3_NewFrame();
+           ImGui_ImplGlfw_NewFrame();
+           ImGui::NewFrame();
+
+
            shader.Bind();
-           shader.SetUniform4f("u_Color", r, 0.4f, 0.8f, 1.0f);
-           va.Bind();
-           eb.Bind();
+           shader.SetUniform4f("u_Color", 0.2f, 0.4f, 0.8f, 1.0f);
+
+           {
+               glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+               glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+               shader.SetUniformMat4f("u_Mvp", proj * model);
+               render.Draw(va, eb, shader);
+           }
+
+           {
+               model = glm::translate(glm::mat4(1.0f), translationB);
+               shader.SetUniformMat4f("u_Mvp", proj * model);
+               render.Draw(va, eb, shader);
+           }
 
 
+           {
+               ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 1.0f);
+               ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 1.0f);
+               ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+           }
 
-           GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
-
-           if (r > 1.0f)
-               increment = -0.05f;
-           else if (r < 0.0f)
-               increment = 0.05f;
-           r += increment;
-
+           ImGui::Render();
+           ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
            /* Swap front and back buffers */
            glfwSwapBuffers(window);
@@ -242,6 +291,10 @@ int main(void)
            /* Poll for and process events */
            glfwPollEvents();
        }
+
+       ImGui_ImplOpenGL3_Shutdown();
+       ImGui_ImplGlfw_Shutdown();
+       ImGui::DestroyContext();
 
        glfwTerminate();
        return 0;

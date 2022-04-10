@@ -34,10 +34,13 @@ file(GLOB glm_head vendor/glm
     vendor/glm/gtx
     vendor/glm/simd)
 
+file(GLOB imgui_src_list vendor/imgui/*.*)
+
 include_directories(
     ${GLFW_PATH}/include
     ${GLEW_PATH}/include
     vendor/stb_image
+    vendor/imgui
     ${glm_head})
 
 find_library(OpenGL_LIBRARY OpenGL )
@@ -48,6 +51,7 @@ add_executable(OpenGL
   ${head_list}
   ${src_list}
   ${stb_image_list}
+  ${imgui_src_list}
   ${shader_list}
   ${texture_list}
 )
