@@ -215,9 +215,9 @@ namespace test
 
         glm::mat4 modelA = glm::translate(glm::mat4(1.0f), m_TranslationA);
         glm::mat4 modelB = glm::translate(glm::mat4(1.0f), m_TranslationB);
-        glm::mat4 modelScale = glm::scale(glm::mat4(1.0f), m_Scale);
-        glm::mat4 mvpA = m_Proj * m_View * modelA * modelScale;
-        glm::mat4 mvpB = m_Proj * m_View * modelB * modelScale;
+        glm::mat4 modelScale = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 1.0f));
+        glm::mat4 mvpA = modelScale * m_Proj * m_View * modelA;
+        glm::mat4 mvpB = modelScale * m_Proj * m_View * modelB;
 
         glm::mat4 mvps[2] = { mvpA, mvpB};
 
