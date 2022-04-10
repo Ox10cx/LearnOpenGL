@@ -8,7 +8,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
@@ -36,11 +36,14 @@ file(GLOB glm_head vendor/glm
 
 file(GLOB imgui_src_list vendor/imgui/*.*)
 
+file(GLOB test_list test/*.*)
+
 include_directories(
     ${GLFW_PATH}/include
     ${GLEW_PATH}/include
     vendor/stb_image
     vendor/imgui
+    test
     ${glm_head})
 
 find_library(OpenGL_LIBRARY OpenGL )
@@ -50,6 +53,7 @@ find_library(IOKit_LIBRARY IOKit )
 add_executable(OpenGL
   ${head_list}
   ${src_list}
+  ${test_list}
   ${stb_image_list}
   ${imgui_src_list}
   ${shader_list}

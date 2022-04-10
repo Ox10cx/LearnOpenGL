@@ -17,6 +17,10 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "TestClearColor.h"
+#include "TestTexture2D.h"
+#include "TestBatchRender.h"
+
 //struct ShaderProgramSource
 //{
 //    std::string VertexSource;
@@ -215,6 +219,17 @@ int main(void)
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui::StyleColorsDark();
 
+
+        test::Test* currentTest = nullptr;
+        test::TestMenu *testMenu = new test::TestMenu(currentTest);
+        currentTest = testMenu;
+
+        testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+        testMenu->RegisterTest<test::TestTexture2D>("texture 2d");
+        testMenu->RegisterTest<test::TestBatchRender>("batch Render");
+
+
+
         const char* glsl_version = "#version 330";
         ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -251,38 +266,55 @@ int main(void)
 //               increment = 0.05f;
 //           r += increment;
 
+//           render.Clear();
+
+
+
+//           shader.Bind();
+//           shader.SetUniform4f("u_Color", 0.2f, 0.4f, 0.8f, 1.0f);
+
+//           {
+//               glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+//               glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+//               shader.SetUniformMat4f("u_Mvp", proj * model);
+//               render.Draw(va, eb, shader);
+//           }
+
+//           {
+//               model = glm::translate(glm::mat4(1.0f), translationB);
+//               shader.SetUniformMat4f("u_Mvp", proj * model);
+//               render.Draw(va, eb, shader);
+//           }
+
+//           {
+//               ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 1.0f);
+//               ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 1.0f);
+//               ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+//           }
+
+           GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
            render.Clear();
+
 
            ImGui_ImplOpenGL3_NewFrame();
            ImGui_ImplGlfw_NewFrame();
            ImGui::NewFrame();
 
-
-           shader.Bind();
-           shader.SetUniform4f("u_Color", 0.2f, 0.4f, 0.8f, 1.0f);
-
-           {
-               glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
-               glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
-               shader.SetUniformMat4f("u_Mvp", proj * model);
-               render.Draw(va, eb, shader);
+           if (currentTest) {
+               currentTest->OnUpdate(0.0f);
+               currentTest->OnRender();
+               ImGui::Begin("Test");
+               if (currentTest != testMenu && ImGui::Button("<--"))
+               {
+                   delete currentTest;
+                   currentTest = testMenu;
+               }
+               currentTest->OnImGuiRender();
+               ImGui::End();
            }
-
-           {
-               model = glm::translate(glm::mat4(1.0f), translationB);
-               shader.SetUniformMat4f("u_Mvp", proj * model);
-               render.Draw(va, eb, shader);
-           }
-
-
-           {
-               ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 1.0f);
-               ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 1.0f);
-               ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-           }
-
 
            ImGui::Render();
+
            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
            /* Swap front and back buffers */
@@ -290,6 +322,12 @@ int main(void)
 
            /* Poll for and process events */
            glfwPollEvents();
+       }
+
+       delete currentTest;
+       if (currentTest != testMenu)
+       {
+           delete testMenu;
        }
 
        ImGui_ImplOpenGL3_Shutdown();
